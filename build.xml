@@ -26,9 +26,6 @@
     <echo message="Compiling examples ===================" />
     <javac includeantruntime="false" debug="on" srcdir="examples" destdir="classes" 
            classpathref="kilim.classpath"/>
-    <echo message="Compiling benchmarks ===================" />
-    <javac includeantruntime="false" debug="on" srcdir="bench" destdir="classes" 
-           classpathref="kilim.classpath"/>
   </target>
   
   <!-- Glob a list of .j files into a space-separated list -->
@@ -48,7 +45,7 @@
   
   <target name="testcompile" depends="asm">
     <echo message="Compiling test ===================" />
-    <javac includeantruntime="false" debug="on" srcdir="test" destdir="classes" 
+    <javac includeantruntime="false" debug="on" srcdir="test" destdir="classes"
            classpathref="kilim.classpath"/>
   </target>
   
@@ -75,8 +72,8 @@
 	<enable/>
       </assertions>
       <arg value="-x" />
-       <!-- Weave tests separately into testclasses --> 
-      <arg value="ExInvalid" /> 
+       <!-- Weave tests separately into testclasses -->
+      <arg value="ExInvalid" />
       <arg value="-d" />
       <arg value="./testclasses" />
       <arg line="./classes" />
@@ -129,7 +126,6 @@
       </zipgroupfileset>
       <exclude name="kilim/test/**" />
       <exclude name="kilim/examples/**" />
-      <exclude name="kilim/bench/**" />
       <manifest>
 		<attribute name="Main-Class" value="kilim.tools.Weaver"/>
       </manifest>	
@@ -138,7 +134,6 @@
     <jar jarfile="kilim-runtime.jar" basedir="classes">
       <exclude name="kilim/test/**" />
       <exclude name="kilim/examples/**" />
-      <exclude name="kilim/bench/**" />
       <exclude name="kilim/tools/**" />
       <exclude name="kilim/analysis/**" />
     </jar>
@@ -149,7 +144,6 @@
 	<jar jarfile="kilim.jar" basedir="classes">
       <exclude name="kilim/test/**" />
       <exclude name="kilim/examples/**" />
-      <exclude name="kilim/bench/**" />
     </jar>
   </target>
 </project>

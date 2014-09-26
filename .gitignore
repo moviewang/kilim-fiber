@@ -1,4 +1,6 @@
-classes/**/*
-testclasses/**/*
-.DS_Store
+/classes/**/*
+/testclasses/**/*
 /classes
+/.idea
+/kilim.iml
+/kilim.jar

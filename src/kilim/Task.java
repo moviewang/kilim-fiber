@@ -514,21 +514,5 @@ public abstract class Task implements EventSubscriber {
     
     public void checkKill() {
     }    
-    
-    /**
-     * Wraps the given object or lambda expression in a Task and starts that task.
-     * Beware of inadvertent sharing when multiple lambdas are created in the same context 
-     * 
-     * @return the spawned task. 
-     */
-    public static Task spawn (Spawnable body) {
-        return new Task() {
-            @Override
-            public void execute() throws Pausable, Exception {
-                body.execute();
-            }
-        }.start();
-    }
-
 }
 

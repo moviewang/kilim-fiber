@@ -108,14 +108,14 @@
   
   <!-- This runs those tests depend on generated classes in testclasses-->
   <target name="testwoven" >
-    <echo message="Testing Tasks ======================" />
-    <java classname="junit.textui.TestRunner" fork="yes">
-      <classpath refid="kilim.testwovenclasspath"/>
-      <assertions>
-        <enable/>
-      </assertions>
-      <arg value="kilim.test.AllWoven" />
-    </java>
+    <!--<echo message="Testing Tasks ======================" />-->
+    <!--<java classname="junit.textui.TestRunner" fork="yes">-->
+      <!--<classpath refid="kilim.testwovenclasspath"/>-->
+      <!--<assertions>-->
+        <!--<enable/>-->
+      <!--</assertions>-->
+      <!--<arg value="kilim.test.AllWoven" />-->
+    <!--</java>-->
   </target>
 
   <target name="jar" description="generate the distribution">

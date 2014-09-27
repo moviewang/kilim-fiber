@@ -4,7 +4,7 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>kilim</groupId>
+	<groupId>org.github.taowen</groupId>
 	<artifactId>kilim</artifactId>
 	<version>1.0</version>
 	<packaging>pom</packaging>
@@ -15,6 +15,12 @@
 			<artifactId>asm-all</artifactId>
 			<version>5.0.3</version>
 		</dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<build>

@@ -8,9 +8,6 @@ package kilim;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.LinkedList;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -327,11 +324,14 @@ public abstract class Task {
                 done = true;
             }
         } else {
-            PauseReason pr = this.pauseReason;
             synchronized (this) {
                 running = false;
             }
         }
+    }
+
+    public void resume() {
+        _runExecute();
     }
 
     @Override

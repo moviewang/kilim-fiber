@@ -1,3 +1,8 @@
+This is a modified version
+Only fiber related stuff remains, mailbox and scheduler has been removed. There is no implicit
+multithreading, messaging or scheduling in this version.
+=====================================================================
+
 Kilim v1.0
 Copyright (c) 2006 Sriram Srinivasan.
 (kilim _at_ malhar.net)

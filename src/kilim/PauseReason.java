@@ -10,8 +10,4 @@ package kilim;
  * @see Task#pause(PauseReason)
  */
 public interface PauseReason {
-    /**
-     * True if the given task's reason for pausing is still valid. 
-     */
-    boolean isValid(Task t);
 }

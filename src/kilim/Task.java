@@ -260,9 +260,7 @@ public abstract class Task implements Runnable {
      * execute method of the following form, and this method 
      * will be called instead. 
      */
-    public  void execute() throws Pausable, Exception {
-        errNotWoven(this);
-    }
+    public abstract void execute() throws Pausable, Exception;
 
     public void execute(Fiber f) throws Exception {
         errNotWoven(this);

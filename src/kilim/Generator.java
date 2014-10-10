@@ -36,7 +36,7 @@ import java.util.NoSuchElementException;
  *  @see kilim.examples.Fib, kilim.examples.Tree
  */
 
-public class Generator<T> extends Task implements Iterator<T>, Iterable<T> {
+public abstract class Generator<T> extends Task implements Iterator<T>, Iterable<T> {
     T nextVal;
 
     public boolean hasNext() {

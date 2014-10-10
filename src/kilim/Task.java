@@ -309,7 +309,6 @@ public abstract class Task {
             // execute() done. Check fiber if it is pausing and reset it.
             isDone = f.end() || (pauseReason instanceof TaskDoneReason);
         } catch (Throwable th) {
-            th.printStackTrace();
             // Definitely done
             setPauseReason(new TaskDoneReason(th));
             isDone = true;
@@ -319,14 +318,13 @@ public abstract class Task {
             // inform on exit
             if (pauseReason instanceof TaskDoneReason) {
                 exitResult = ((TaskDoneReason)pauseReason).exitObj;
+                if (exitResult instanceof Throwable) {
+                    throw new RuntimeException("task is done with exception", (Throwable) exitResult);
+                }
             }
-            synchronized(this){
-                done = true;
-            }
+            done = true;
         } else {
-            synchronized (this) {
-                running = false;
-            }
+            running = false;
         }
     }
 

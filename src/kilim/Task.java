@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * provide a pausable execute method. 
  *
  */
-public abstract class Task {
+public abstract class Task implements Runnable {
 
     static PauseReason         yieldReason = new YieldReason();
     /**
@@ -295,11 +295,9 @@ public abstract class Task {
     }
     
     /**
-     * Called by WorkerThread, it is the wrapper that performs pre and post
-     * execute processing (in addition to calling the execute(fiber) method
-     * of the task.
+     * Run the fiber until pause/yield is called inside
      */
-    public void _runExecute() throws NotPausable {
+    public synchronized void _runExecute() throws NotPausable {
         Fiber f = fiber;
         boolean isDone = false; 
         try {
@@ -328,7 +326,7 @@ public abstract class Task {
         }
     }
 
-    public void resume() {
+    public void run() {
         _runExecute();
     }
 

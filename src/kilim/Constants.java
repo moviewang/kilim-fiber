@@ -5,7 +5,7 @@
  */
 package kilim;
 
-import org.objectweb.asm.Opcodes;
+import asm5.org.objectweb.asm.Opcodes;
 
 public interface Constants extends Opcodes {
     

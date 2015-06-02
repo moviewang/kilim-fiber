@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
+import asm5.org.objectweb.asm.ClassWriter;
+import asm5.org.objectweb.asm.Label;
+import asm5.org.objectweb.asm.MethodVisitor;
+import asm5.org.objectweb.asm.Type;
 
 /**
  * This is a replacement for the jasmin bytecode assembler and uses the same

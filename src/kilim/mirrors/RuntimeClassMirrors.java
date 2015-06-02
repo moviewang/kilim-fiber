@@ -7,7 +7,7 @@ import java.util.WeakHashMap;
 
 import kilim.KilimClassLoader;
 
-import org.objectweb.asm.Type;
+import asm5.org.objectweb.asm.Type;
 
 /**
  * This class provides the Mirrors facade over a set of Class objects

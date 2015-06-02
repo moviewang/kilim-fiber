@@ -7,13 +7,13 @@
 package kilim.analysis;
 import static kilim.Constants.STATE_CLASS;
 import static kilim.Constants.WOVEN_FIELD;
-import static org.objectweb.asm.Opcodes.ACC_FINAL;
-import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
-import static org.objectweb.asm.Opcodes.ACC_STATIC;
-import static org.objectweb.asm.Opcodes.ALOAD;
-import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
-import static org.objectweb.asm.Opcodes.RETURN;
-import static org.objectweb.asm.Opcodes.V1_1;
+import static asm5.org.objectweb.asm.Opcodes.ACC_FINAL;
+import static asm5.org.objectweb.asm.Opcodes.ACC_PUBLIC;
+import static asm5.org.objectweb.asm.Opcodes.ACC_STATIC;
+import static asm5.org.objectweb.asm.Opcodes.ALOAD;
+import static asm5.org.objectweb.asm.Opcodes.INVOKESPECIAL;
+import static asm5.org.objectweb.asm.Opcodes.RETURN;
+import static asm5.org.objectweb.asm.Opcodes.V1_1;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,13 +26,13 @@ import kilim.Constants;
 import kilim.KilimException;
 import kilim.mirrors.Detector;
 
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.InnerClassNode;
+import asm5.org.objectweb.asm.Attribute;
+import asm5.org.objectweb.asm.ClassVisitor;
+import asm5.org.objectweb.asm.ClassWriter;
+import asm5.org.objectweb.asm.MethodVisitor;
+import asm5.org.objectweb.asm.tree.AnnotationNode;
+import asm5.org.objectweb.asm.tree.FieldNode;
+import asm5.org.objectweb.asm.tree.InnerClassNode;
 
 /**
  * This class is the main entry point for the Weave tool. It uses

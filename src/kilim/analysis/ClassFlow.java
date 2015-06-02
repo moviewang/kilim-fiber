@@ -12,11 +12,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
+import asm5.org.objectweb.asm.ClassReader;
+import asm5.org.objectweb.asm.MethodVisitor;
+import asm5.org.objectweb.asm.Opcodes;
+import asm5.org.objectweb.asm.tree.ClassNode;
+import asm5.org.objectweb.asm.tree.FieldNode;
 
 /**
  * This class reads a .class file (or stream), wraps each method with a MethodFlow object and optionally analyzes it.

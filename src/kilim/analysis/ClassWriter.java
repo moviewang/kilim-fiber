@@ -3,7 +3,7 @@ package kilim.analysis;
 import kilim.mirrors.Detector;
 import kilim.mirrors.RuntimeClassMirrors;
 
-public class ClassWriter extends org.objectweb.asm.ClassWriter {
+public class ClassWriter extends asm5.org.objectweb.asm.ClassWriter {
 	private final Detector detector;
 	
 	public ClassWriter(final int flags, final ClassLoader classLoader) {

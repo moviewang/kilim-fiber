@@ -9,15 +9,15 @@ import static kilim.Constants.D_DOUBLE;
 import static kilim.Constants.D_FLOAT;
 import static kilim.Constants.D_LONG;
 import static kilim.Constants.D_OBJECT;
-import static org.objectweb.asm.Opcodes.ACC_STATIC;
-import static org.objectweb.asm.Opcodes.ACC_SYNCHRONIZED;
-import static org.objectweb.asm.Opcodes.ALOAD;
-import static org.objectweb.asm.Opcodes.DLOAD;
-import static org.objectweb.asm.Opcodes.FLOAD;
-import static org.objectweb.asm.Opcodes.ILOAD;
-import static org.objectweb.asm.Opcodes.LLOAD;
+import static asm5.org.objectweb.asm.Opcodes.ACC_STATIC;
+import static asm5.org.objectweb.asm.Opcodes.ACC_SYNCHRONIZED;
+import static asm5.org.objectweb.asm.Opcodes.ALOAD;
+import static asm5.org.objectweb.asm.Opcodes.DLOAD;
+import static asm5.org.objectweb.asm.Opcodes.FLOAD;
+import static asm5.org.objectweb.asm.Opcodes.ILOAD;
+import static asm5.org.objectweb.asm.Opcodes.LLOAD;
 
-import org.objectweb.asm.tree.MethodNode;
+import asm5.org.objectweb.asm.tree.MethodNode;
 
 
 /**

@@ -12,14 +12,14 @@ import static kilim.Constants.FIBER_CLASS;
 import static kilim.Constants.TASK_CLASS;
 import static kilim.analysis.VMType.TOBJECT;
 import static kilim.analysis.VMType.loadVar;
-import static org.objectweb.asm.Opcodes.ALOAD;
-import static org.objectweb.asm.Opcodes.ASTORE;
-import static org.objectweb.asm.Opcodes.DUP;
-import static org.objectweb.asm.Opcodes.GETFIELD;
-import static org.objectweb.asm.Opcodes.GOTO;
-import static org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
-import static org.objectweb.asm.Opcodes.RETURN;
+import static asm5.org.objectweb.asm.Opcodes.ALOAD;
+import static asm5.org.objectweb.asm.Opcodes.ASTORE;
+import static asm5.org.objectweb.asm.Opcodes.DUP;
+import static asm5.org.objectweb.asm.Opcodes.GETFIELD;
+import static asm5.org.objectweb.asm.Opcodes.GOTO;
+import static asm5.org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static asm5.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static asm5.org.objectweb.asm.Opcodes.RETURN;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,20 +27,20 @@ import java.util.List;
 import kilim.Constants;
 import kilim.mirrors.Detector;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.InvokeDynamicInsnNode;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.LocalVariableNode;
-import org.objectweb.asm.tree.LookupSwitchInsnNode;
-import org.objectweb.asm.tree.TableSwitchInsnNode;
-import org.objectweb.asm.tree.TryCatchBlockNode;
+import asm5.org.objectweb.asm.AnnotationVisitor;
+import asm5.org.objectweb.asm.Attribute;
+import asm5.org.objectweb.asm.ClassVisitor;
+import asm5.org.objectweb.asm.Handle;
+import asm5.org.objectweb.asm.MethodVisitor;
+import asm5.org.objectweb.asm.Type;
+import asm5.org.objectweb.asm.tree.AbstractInsnNode;
+import asm5.org.objectweb.asm.tree.AnnotationNode;
+import asm5.org.objectweb.asm.tree.InvokeDynamicInsnNode;
+import asm5.org.objectweb.asm.tree.LabelNode;
+import asm5.org.objectweb.asm.tree.LocalVariableNode;
+import asm5.org.objectweb.asm.tree.LookupSwitchInsnNode;
+import asm5.org.objectweb.asm.tree.TableSwitchInsnNode;
+import asm5.org.objectweb.asm.tree.TryCatchBlockNode;
 
 /**
  * This class takes the basic blocks from a MethodFlow and generates 

@@ -6,10 +6,10 @@ import kilim.mirrors.ClassMirrorNotFoundException;
 import kilim.mirrors.Detector;
 import kilim.mirrors.MethodMirror;
 
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.MethodInsnNode;
+import asm5.org.objectweb.asm.ClassVisitor;
+import asm5.org.objectweb.asm.MethodVisitor;
+import asm5.org.objectweb.asm.Opcodes;
+import asm5.org.objectweb.asm.tree.MethodInsnNode;
 
 /**
  * {@code SAMweaver} generates code to support functional interfaces (also known

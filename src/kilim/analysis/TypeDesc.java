@@ -26,7 +26,7 @@ import kilim.Constants;
 import kilim.mirrors.ClassMirrorNotFoundException;
 import kilim.mirrors.Detector;
 
-import org.objectweb.asm.Type;
+import asm5.org.objectweb.asm.Type;
 
 /**
  * A utility class that provides static methods for interning type strings and merging type

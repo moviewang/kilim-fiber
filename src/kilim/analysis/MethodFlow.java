@@ -10,9 +10,9 @@ import static kilim.Constants.PAUSABLE_CLASS;
 import static kilim.analysis.BasicBlock.COALESCED;
 import static kilim.analysis.BasicBlock.ENQUEUED;
 import static kilim.analysis.BasicBlock.INLINE_CHECKED;
-import static org.objectweb.asm.Opcodes.ACC_STATIC;
-import static org.objectweb.asm.Opcodes.ACC_VOLATILE;
-import static org.objectweb.asm.Opcodes.JSR;
+import static asm5.org.objectweb.asm.Opcodes.ACC_STATIC;
+import static asm5.org.objectweb.asm.Opcodes.ACC_VOLATILE;
+import static asm5.org.objectweb.asm.Opcodes.JSR;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,20 +26,20 @@ import java.util.TreeMap;
 import kilim.KilimException;
 import kilim.mirrors.Detector;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.FrameNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.LineNumberNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.TryCatchBlockNode;
+import asm5.org.objectweb.asm.AnnotationVisitor;
+import asm5.org.objectweb.asm.Handle;
+import asm5.org.objectweb.asm.Label;
+import asm5.org.objectweb.asm.MethodVisitor;
+import asm5.org.objectweb.asm.Opcodes;
+import asm5.org.objectweb.asm.tree.AbstractInsnNode;
+import asm5.org.objectweb.asm.tree.AnnotationNode;
+import asm5.org.objectweb.asm.tree.FrameNode;
+import asm5.org.objectweb.asm.tree.InsnList;
+import asm5.org.objectweb.asm.tree.LabelNode;
+import asm5.org.objectweb.asm.tree.LineNumberNode;
+import asm5.org.objectweb.asm.tree.MethodInsnNode;
+import asm5.org.objectweb.asm.tree.MethodNode;
+import asm5.org.objectweb.asm.tree.TryCatchBlockNode;
 
 
 /** 

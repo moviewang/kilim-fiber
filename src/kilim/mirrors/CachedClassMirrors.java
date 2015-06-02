@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import asm5.org.objectweb.asm.AnnotationVisitor;
+import asm5.org.objectweb.asm.Attribute;
+import asm5.org.objectweb.asm.ClassReader;
+import asm5.org.objectweb.asm.ClassVisitor;
+import asm5.org.objectweb.asm.FieldVisitor;
+import asm5.org.objectweb.asm.MethodVisitor;
+import asm5.org.objectweb.asm.Opcodes;
 
 
 /**

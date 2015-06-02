@@ -25,7 +25,7 @@ import static kilim.Constants.D_SHORT;
 import static kilim.Constants.D_VOID;
 import static kilim.Constants.TASK_CLASS;
 import static kilim.Constants.THROWABLE_CLASS;
-import static org.objectweb.asm.Opcodes.*;
+import static asm5.org.objectweb.asm.Opcodes.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,21 +38,21 @@ import java.util.Stack;
 import kilim.KilimException;
 import kilim.mirrors.Detector;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.IincInsnNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.IntInsnNode;
-import org.objectweb.asm.tree.InvokeDynamicInsnNode;
-import org.objectweb.asm.tree.JumpInsnNode;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.LookupSwitchInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MultiANewArrayInsnNode;
-import org.objectweb.asm.tree.TableSwitchInsnNode;
-import org.objectweb.asm.tree.TypeInsnNode;
-import org.objectweb.asm.tree.VarInsnNode;
+import asm5.org.objectweb.asm.tree.AbstractInsnNode;
+import asm5.org.objectweb.asm.tree.FieldInsnNode;
+import asm5.org.objectweb.asm.tree.IincInsnNode;
+import asm5.org.objectweb.asm.tree.InsnList;
+import asm5.org.objectweb.asm.tree.IntInsnNode;
+import asm5.org.objectweb.asm.tree.InvokeDynamicInsnNode;
+import asm5.org.objectweb.asm.tree.JumpInsnNode;
+import asm5.org.objectweb.asm.tree.LabelNode;
+import asm5.org.objectweb.asm.tree.LdcInsnNode;
+import asm5.org.objectweb.asm.tree.LookupSwitchInsnNode;
+import asm5.org.objectweb.asm.tree.MethodInsnNode;
+import asm5.org.objectweb.asm.tree.MultiANewArrayInsnNode;
+import asm5.org.objectweb.asm.tree.TableSwitchInsnNode;
+import asm5.org.objectweb.asm.tree.TypeInsnNode;
+import asm5.org.objectweb.asm.tree.VarInsnNode;
 
 /**
  * A basic block is a contiguous set of instructions that has one label at the

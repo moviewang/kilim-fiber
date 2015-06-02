@@ -9,7 +9,7 @@ import static kilim.analysis.Utils.dedent;
 import static kilim.analysis.Utils.indent;
 import static kilim.analysis.Utils.pn;
 import static kilim.analysis.Utils.resetIndentation;
-import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static asm5.org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,8 +31,8 @@ import kilim.analysis.Usage;
 import kilim.analysis.Value;
 import kilim.mirrors.Detector;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
+import asm5.org.objectweb.asm.tree.AbstractInsnNode;
+import asm5.org.objectweb.asm.tree.MethodInsnNode;
 
 /**
  * Used to dump the stack and locals at the beginning of each basic block

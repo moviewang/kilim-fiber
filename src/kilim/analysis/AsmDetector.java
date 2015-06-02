@@ -6,9 +6,9 @@ import java.util.HashMap;
 
 import kilim.mirrors.Detector;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodNode;
+import asm5.org.objectweb.asm.ClassReader;
+import asm5.org.objectweb.asm.tree.ClassNode;
+import asm5.org.objectweb.asm.tree.MethodNode;
 
 /**
  * This class is called by Detector to parse signatures of classes

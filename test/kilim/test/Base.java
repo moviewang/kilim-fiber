@@ -14,8 +14,8 @@ import kilim.analysis.ClassFlow;
 import kilim.analysis.MethodFlow;
 import kilim.mirrors.Detector;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
+import asm5.org.objectweb.asm.tree.AbstractInsnNode;
+import asm5.org.objectweb.asm.tree.MethodInsnNode;
 
 public class Base extends TestCase {
     private static ArrayList<MethodFlow> stflows;

@@ -24,15 +24,15 @@ import java.util.zip.ZipEntry;
 
 import kilim.analysis.TypeDesc;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import asm5.org.objectweb.asm.AnnotationVisitor;
+import asm5.org.objectweb.asm.Attribute;
+import asm5.org.objectweb.asm.ClassReader;
+import asm5.org.objectweb.asm.ClassVisitor;
+import asm5.org.objectweb.asm.FieldVisitor;
+import asm5.org.objectweb.asm.Handle;
+import asm5.org.objectweb.asm.Label;
+import asm5.org.objectweb.asm.MethodVisitor;
+import asm5.org.objectweb.asm.Opcodes;
 
 /**
  * Equivalent to javap -c -l -private, but the output is in jasmin's format 

@@ -8,3 +8,6 @@ javadoc
 kilim-javadoc.jar
 kilim-sources.jar
 bin
+.classpath
+.project
+.settings

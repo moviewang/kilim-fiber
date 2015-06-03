@@ -4,9 +4,7 @@
 .idea
 /kilim.iml
 /kilim.jar
-.classpath
-.project
-.settings
 javadoc
 kilim-javadoc.jar
 kilim-sources.jar
+bin

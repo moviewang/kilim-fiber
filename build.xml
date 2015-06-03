@@ -146,7 +146,9 @@
 		</jar>
 		<jar jarfile="kilim-sources.jar" basedir="src">
 		</jar>
-		<javadoc sourcepath="src" destdir="javadoc" />
+		<javadoc sourcepath="src" destdir="javadoc">
+			<arg value="-quiet" />
+		</javadoc>
 		<jar jarfile="kilim-javadoc.jar" basedir="javadoc">
 		</jar>
 	</target>

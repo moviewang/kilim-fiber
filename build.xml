@@ -115,6 +115,7 @@
 		<!--</java>-->
 	</target>
 
+	<!--
 	<target name="jar" description="generate the distribution">
 		<copy file="License" todir="classes/kilim" />
 		<jar jarfile="kilim.jar" basedir="classes">
@@ -135,12 +136,18 @@
 			<exclude name="kilim/analysis/**" />
 		</jar>
 	</target>
+	-->
 
 	<target name="maven" depends="all,test" description="generate the maven jar">
 		<copy file="License" todir="classes/kilim" />
 		<jar jarfile="kilim.jar" basedir="classes">
 			<exclude name="kilim/test/**" />
 			<exclude name="kilim/examples/**" />
+		</jar>
+		<jar jarfile="kilim-sources.jar" basedir="src">
+		</jar>
+		<javadoc sourcepath="src" destdir="javadoc" />
+		<jar jarfile="kilim-javadoc.jar" basedir="javadoc">
 		</jar>
 	</target>
 </project>

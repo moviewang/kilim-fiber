@@ -91,7 +91,7 @@ public class Detector {
     }
 
     public ClassMirror classForName(String className) throws ClassMirrorNotFoundException {
-        className = className.replace('/', '.');
+        if(className != null) className = className.replace('/', '.');
         return mirrors.classForName(className);
     }
 

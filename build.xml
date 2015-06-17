@@ -115,34 +115,14 @@
 		<!--</java>-->
 	</target>
 
-	<!--
-	<target name="jar" description="generate the distribution">
-		<copy file="License" todir="classes/kilim" />
-		<jar jarfile="kilim.jar" basedir="classes">
-			<zipgroupfileset dir="libs" includes="*.jar">
-				<exclude name="junit.jar" />
-			</zipgroupfileset>
-			<exclude name="kilim/test/**" />
-			<exclude name="kilim/examples/**" />
-			<manifest>
-				<attribute name="Main-Class" value="kilim.tools.Weaver" />
-			</manifest>
-		</jar>
-
-		<jar jarfile="kilim-runtime.jar" basedir="classes">
-			<exclude name="kilim/test/**" />
-			<exclude name="kilim/examples/**" />
-			<exclude name="kilim/tools/**" />
-			<exclude name="kilim/analysis/**" />
-		</jar>
-	</target>
-	-->
-
 	<target name="maven" depends="all,test" description="generate the maven jar">
 		<copy file="License" todir="classes/kilim" />
 		<jar jarfile="kilim.jar" basedir="classes">
 			<exclude name="kilim/test/**" />
 			<exclude name="kilim/examples/**" />
+			<manifest>
+				<attribute name="Main-Class" value="kilim.tools.Weaver" />
+			</manifest>
 		</jar>
 		<jar jarfile="kilim-sources.jar" basedir="src">
 		</jar>

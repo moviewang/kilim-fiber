@@ -123,11 +123,15 @@ class CachedClassMirror extends ClassVisitor implements ClassMirror  {
     @Override
     public boolean isAssignableFrom(ClassMirror c) throws ClassMirrorNotFoundException {
         Detector d = Detector.getDetector();
-        if (this.equals(c)) return true;
-        
-        ClassMirror supcl = d.classForName(c.getSuperclass());
-        if (isAssignableFrom(supcl)) return true;
-        for (String icl: c.getInterfaces()) {
+        if (this.equals(c))
+            return true;
+        String superName = c.getSuperclass();
+        if (superName == null)// when 'c' is java.lang.Object
+            return false;
+        ClassMirror supcl = d.classForName(superName);
+        if (isAssignableFrom(supcl))
+            return true;
+        for (String icl : c.getInterfaces()) {
             supcl = d.classForName(icl);
             if (isAssignableFrom(supcl))
                 return true;

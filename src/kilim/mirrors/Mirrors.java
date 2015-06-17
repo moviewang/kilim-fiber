@@ -1,14 +1,24 @@
 package kilim.mirrors;
 
-/** 
- * Mirrors provides a uniform facade for class and method related information 
- * (via ClassMirror and MethodMirror). This information is obtained either through 
- * loaded Class objects or parsed bytecode.
+/**
+ * Mirrors provides a uniform facade for class and method related information
+ * (via ClassMirror and MethodMirror). This information is obtained either
+ * through loaded Class objects or parsed bytecode.
  */
 public interface Mirrors {
-	abstract public ClassMirror classForName(String className)
-		throws ClassMirrorNotFoundException;
+    /**
+     * find mirrored class
+     */
+    abstract public ClassMirror classForName(String className) throws ClassMirrorNotFoundException;
 
-	public abstract ClassMirror  mirror(Class<?> clazz);
-    public abstract ClassMirror  mirror(String className, byte[] bytecode);
+    /**
+     * mirror a class in a class loading manner
+     */
+    public abstract ClassMirror mirror(Class<?> clazz);
+
+    /**
+     * mirror a class in a bytecode analysis manner
+     */
+    public abstract ClassMirror mirror(String className, byte[] bytecode);
+
 }

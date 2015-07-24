@@ -24,7 +24,7 @@ import kilim.mirrors.CachedClassMirrors;
 import kilim.mirrors.Detector;
 
 /**
- * This class supports both command-line and run time weaving of Kilim bytecode. 
+ * This class supports both command-line and run time weaving of Kilim bytecode.
  */
 
 public class Weaver {
@@ -38,18 +38,25 @@ public class Weaver {
      * Usage: java kilim.tools.Weaver -d &lt;output directory&gt; {source classe, jar, directory ...}
      * </pre>
      * 
-     * If directory names or jar files are given, all classes in that container are processed. It is
-     * perfectly fine to specify the same directory for source and output like this: 
+     * If directory names or jar files are given, all classes in that container
+     * are processed. It is perfectly fine to specify the same directory for
+     * source and output like this:
+     * 
      * <pre>
      *    java kilim.tools.Weaver -d ./classes ./classes
      * </pre>
-     * Ensure that all classes to be woven are in the classpath. The output directory does not have to be 
-     * in the classpath during weaving.
-     *   
+     * 
+     * Ensure that all classes to be woven are in the classpath. The output
+     * directory does not have to be in the classpath during weaving.
+     * 
      * @see #weave(List) for run-time weaving.
      */
     public static void main(String[] args) throws IOException {
-        
+
+        WarPathClassLoader wpcl = new WarPathClassLoader(Thread.currentThread().getContextClassLoader());
+        // set context class loader for use in detector, supporting war archive
+        // classpath
+        Thread.currentThread().setContextClassLoader(wpcl);
         Detector detector = Detector.DEFAULT;
 
         String currentName = null;
@@ -64,11 +71,27 @@ public class Weaver {
                     for (FileLister.Entry fe : new FileLister(name)) {
                         currentName = fe.getFileName();
                         if (currentName.endsWith(".class")) {
-                            currentName = currentName.substring(0, currentName.length() - 6)
-                                    .replace('/', '.');
-                            if (exclude(currentName))
-                                continue;
-                            weaveFile(currentName, fe.getInputStream(), detector);
+                            weaveClsInJar(currentName, fe.getInputStream(), detector, null);
+                        }
+                    }
+                } else if (name.endsWith(".war")) {
+                    wpcl.setWarPath(name);
+                    String exWarPath = wpcl.getExplodedWarPath();
+                    if (!exWarPath.endsWith("/"))
+                        exWarPath += "/";
+                    for (FileLister.Entry fe : new FileLister(name)) {
+                        currentName = fe.getFileName();
+                        if (currentName.endsWith(".class") && currentName.startsWith("WEB-INF/classes/")) {
+                            // class file in /WEB-INF/classes
+                            weaveClsInJar(currentName, fe.getInputStream(), detector, "WEB-INF/classes");
+                        } else if (currentName.endsWith(".jar") && currentName.startsWith("WEB-INF/lib/")) {
+                            // jar in a war, need to read from exploded war dir
+                            for (FileLister.Entry e : new FileLister(exWarPath + currentName)) {
+                                String jfn = e.getFileName();
+                                if (jfn.endsWith(".class")) {
+                                    weaveClsInWarJar(currentName, jfn, e.getInputStream(), detector);
+                                }
+                            }
                         }
                     }
                 } else if (new File(name).isDirectory()) {
@@ -97,6 +120,38 @@ public class Weaver {
             }
         }
         System.exit(err);
+    }
+
+    private static void weaveClsInWarJar(String jarName, String fileInWarJar, InputStream fileStream, Detector detector) throws IOException {
+        String clsName = fileInWarJar.substring(0, fileInWarJar.length() - 6).replace('/', '.');
+        if (exclude(clsName))
+            return;
+        // change output dir...
+        String tmp = outputDir;
+        if (!outputDir.endsWith("/"))
+            outputDir += "/";
+        outputDir += jarName;
+        weaveFile(clsName, fileStream, detector);
+        // recover output dir after weaving...
+        outputDir = tmp;
+    }
+
+    private static void weaveClsInJar(String clsFilePath, InputStream clsFileStream, Detector detector, String pathPrefix) throws IOException {
+        String clsName = clsFilePath.substring(0, clsFilePath.length() - 6).replace('/', '.');
+        if (exclude(clsName))
+            return;
+        if (pathPrefix != null) {
+            // temporarily change output directory with path prefix
+            String tmp = outputDir;
+            if (!outputDir.endsWith("/"))
+                outputDir += "/";
+            outputDir += pathPrefix;
+            weaveFile(clsName, clsFileStream, detector);
+            // recover output dir after weaving...
+            outputDir = tmp;
+        } else {
+            weaveFile(clsName, clsFileStream, detector);
+        }
     }
 
     static boolean exclude(String name) {
@@ -205,6 +260,7 @@ public class Weaver {
         System.exit(1);
     }
 
+    // parse args, determine dest dir, and return files to weave
     static ArrayList<String> parseArgs(String[] args) throws IOException {
         if (args.length == 0)
             help();
@@ -240,7 +296,7 @@ public class Weaver {
     public Weaver() {
         this(Thread.currentThread().getContextClassLoader());
     }
-    
+
     public Weaver(ClassLoader cl) {
         mirrors = new CachedClassMirrors(cl);
         detector = new Detector(mirrors);
@@ -257,36 +313,43 @@ public class Weaver {
     }
 
     /**
-     * Analyzes the list of supplied classes and inserts Kilim-related bytecode if necessary. If a
-     * supplied class is dependent upon another class X, it is the caller's responsibility to ensure
-     * that X is either in the classpath, or loaded by the context classloader, or has been seen in
-     * an earlier invocation of weave().  
+     * Analyzes the list of supplied classes and inserts Kilim-related bytecode
+     * if necessary. If a supplied class is dependent upon another class X, it
+     * is the caller's responsibility to ensure that X is either in the
+     * classpath, or loaded by the context classloader, or has been seen in an
+     * earlier invocation of weave().
      * 
-     * Since weave() remembers method signatures from earlier invocations, the woven classes do not
-     * have to be classloaded to help future invocations of weave. 
+     * Since weave() remembers method signatures from earlier invocations, the
+     * woven classes do not have to be classloaded to help future invocations of
+     * weave.
      * 
-     * If two classes A and B are not in the classpath, and are mutually recursive, they can be woven
-     * only if supplied in the same input list.
-     *  
+     * If two classes A and B are not in the classpath, and are mutually
+     * recursive, they can be woven only if supplied in the same input list.
+     * 
      * This method is thread safe.
      * 
-     * @param classes A list of (className, byte[]) pairs. The first part is a fully qualified class
-     *            name, and the second part is the bytecode for the class.
+     * @param classes
+     *            A list of (className, byte[]) pairs. The first part is a fully
+     *            qualified class name, and the second part is the bytecode for
+     *            the class.
      * 
-     * @return A list of (className, byte[]) pairs. Some of the classes may or may not have been
-     *         modified, and new ones may be added.
+     * @return A list of (className, byte[]) pairs. Some of the classes may or
+     *         may not have been modified, and new ones may be added.
      * 
      * @throws KilimException
      */
     public List<ClassInfo> weave(List<ClassInfo> classes) throws KilimException {
-        // save the detector attached to this thread, if any. It will be restored
+        // save the detector attached to this thread, if any. It will be
+        // restored
         // later.
         ArrayList<ClassInfo> ret = new ArrayList<ClassInfo>(classes.size());
         Detector origDetector = Detector.getDetector();
         Detector.setDetector(detector); // / set thread local detector.
         try {
-            // First cache all the method signatures from the supplied classes to allow
-            // the weaver to lookup method signatures from mutually recursive classes.
+            // First cache all the method signatures from the supplied classes
+            // to allow
+            // the weaver to lookup method signatures from mutually recursive
+            // classes.
             for (ClassInfo cl : classes) {
                 detector.mirrors.mirror(cl.className, cl.bytes);
             }
@@ -295,7 +358,8 @@ public class Weaver {
             for (ClassInfo cl : classes) {
                 ClassWeaver cw = new ClassWeaver(cl.bytes, detector);
                 cw.weave();
-                ret.addAll(cw.getClassInfos()); // one class file can result in multiple classes
+                ret.addAll(cw.getClassInfos()); // one class file can result in
+                                                // multiple classes
             }
             return ret;
         } finally {

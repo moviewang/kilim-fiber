@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -32,6 +33,8 @@ public class Weaver {
     public static boolean verbose = true;
     public static Pattern excludePattern = null;
     static int err = 0;
+
+    static WarWriter ww;
 
     /**
      * <pre>
@@ -119,6 +122,8 @@ public class Weaver {
                 System.exit(1);
             }
         }
+        if (ww != null)
+            ww.done();
         System.exit(err);
     }
 
@@ -231,11 +236,27 @@ public class Weaver {
             if (new File(className).exists())
                 return;
         }
-        FileOutputStream fos = new FileOutputStream(className);
+        // support jar/war writing
+        OutputStream fos = getFileOutputStream(className);
         fos.write(ci.bytes);
         fos.close();
         if (verbose) {
             System.out.println("Wrote: " + className);
+        }
+    }
+
+    // support jar/war writing
+    private static OutputStream getFileOutputStream(String filePath) throws IOException {
+        File f = new File(outputDir);
+        if (f.isDirectory()) {
+            return new FileOutputStream(filePath);
+        } else if (outputDir.endsWith(".jar") || outputDir.endsWith(".war")) {
+            if (ww == null)
+                ww = new WarWriter(outputDir);
+            String relPath = filePath.substring(outputDir.length(), filePath.length());
+            return ww.getFileOutputStream(relPath);
+        } else {
+            throw new RuntimeException("Unsupported output destination format: " + outputDir);
         }
     }
 

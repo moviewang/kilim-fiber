@@ -127,7 +127,7 @@ public class WarPathClassLoader extends URLClassLoader {
         }
     }
 
-    public static File createTempDirectory(String dirName) {
+    private static File createTempDirectory(String dirName) {
         final File temp;
 
         try {

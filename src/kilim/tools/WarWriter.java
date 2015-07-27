@@ -1,12 +1,14 @@
 package kilim.tools;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -80,12 +82,14 @@ public class WarWriter {
 
     /**
      * Complete writing, rebuild the final result jar/war file and do cleaning.
+     * 
+     * @throws IOException
      */
-    public void done() {
+    public void done() throws IOException {
         // really writing to the war file, in fact a merging from the temp dir
         // writing to war
         // // listing temp dir files in jar entry naming style
-        Map<String, File> tempDirFiles = listTempDirInJarEntryNamingStyle();
+        Map<String, File> tempDirFiles = listFilesInJarEntryNamingStyle(this.tempDir, this.tempDir.getAbsolutePath());
         // // create temp war
         File tempWar = File.createTempFile(this.warFile.getName(), null);
         // // merging write to the temp war
@@ -95,53 +99,202 @@ public class WarWriter {
         while (iter.hasMoreElements()) {
             JarEntry e = iter.nextElement();
             String name = e.getName();
-            // prefer file in dir to war
-            if (tempDirFiles.containsKey(name)) {
-                // TODO
+            if (!e.isDirectory() && name.endsWith(".jar")) {
+                writeJarEntry(e, filterByDirName(tempDirFiles, name), jf, jos);
             } else {
+                // prefer file in dir to war
+                InputStream fin = null;
+                if (tempDirFiles.containsKey(name)) {
+                    File f = tempDirFiles.get(name);
+                    if (!e.isDirectory())
+                        fin = new FileInputStream(f);
+                    addEntry(name, fin, f.lastModified(), jos);
+                    tempDirFiles.remove(name);
+                } else {
+                    if (!e.isDirectory())
+                        fin = jf.getInputStream(e);
+                    addEntry(name, fin, e.getTime(), jos);
+                }
             }
         }
+        jf.close();
         // // writing remained files in dir
+        for (Map.Entry<String, File> remain : tempDirFiles.entrySet()) {
+            String dirFileName = remain.getKey();
+            File dirFile = remain.getValue();
+            InputStream in = null;
+            if (!dirFile.isDirectory())
+                in = new FileInputStream(dirFile);
+            addEntry(dirFileName, in, dirFile.lastModified(), jos);
+        }
         // // replace the target war using the temp war
+        jos.close();
+        tempWar.renameTo(warFile);
         // clean
         // // cleaning temp dir
+        recurDel(this.tempDir);
     }
 
-    private static void addEntry(File source, JarOutputStream target) throws IOException {
-        BufferedInputStream in = null;
-        try {
-            if (source.isDirectory()) {
-                String name = source.getPath().replace("\\", "/");
-                if (!name.isEmpty()) {
-                    if (!name.endsWith("/"))
-                        name += "/";
-                    JarEntry entry = new JarEntry(name);
-                    entry.setTime(source.lastModified());
-                    target.putNextEntry(entry);
-                    target.closeEntry();
-                }
-                for (File nestedFile : source.listFiles())
-                    addEntry(nestedFile, target);
-                return;
+    /*
+     * list the files&dirs in the specified dir, in a jar entry naming style: 1)
+     * all file names come with no preceding '/' 2) all file names of
+     * directories must be suffixed by a '/'
+     */
+    private static Map<String, File> listFilesInJarEntryNamingStyle(File f, String basePath) {
+        Map<String, File> ret = new HashMap<String, File>();
+        String name = f.getAbsolutePath().substring(basePath.length());
+        if (name.startsWith("/"))
+            name = name.substring(1);
+        if (f.isDirectory()) {
+            if (!name.endsWith("/"))
+                name += "/";
+            for (File sub : f.listFiles()) {
+                ret.putAll(listFilesInJarEntryNamingStyle(sub, basePath));
             }
-
-            JarEntry entry = new JarEntry(source.getPath().replace("\\", "/"));
-            entry.setTime(source.lastModified());
-            target.putNextEntry(entry);
-            in = new BufferedInputStream(new FileInputStream(source));
-
-            byte[] buffer = new byte[1024];
-            while (true) {
-                int count = in.read(buffer);
-                if (count == -1)
-                    break;
-                target.write(buffer, 0, count);
-            }
-            target.closeEntry();
-        } finally {
-            if (in != null)
-                in.close();
         }
+        // add the current level directory itself except for the root dir
+        if (!"/".equals(name))
+            ret.put(name, f);
+        return ret;
+    }
+
+    private static void recurDel(File file) {
+        if (file.isDirectory()) {
+            for (File item : file.listFiles())
+                recurDel(item);
+        }
+        file.delete();
+    }
+
+    // merging write jar entry
+    private void writeJarEntry(JarEntry origJarEntry, Map<String, File> mergingFiles, JarFile origWar, JarOutputStream targetWarStream)
+            throws IOException {
+        // if there's no merging file for this jar entry, write the original jar
+        // data directly
+        if (mergingFiles == null || mergingFiles.isEmpty()) {
+            JarEntry je = new JarEntry(origJarEntry.getName());
+            je.setTime(origJarEntry.getTime());
+            targetWarStream.putNextEntry(je);
+            flowTo(origWar.getInputStream(origJarEntry), targetWarStream);
+            targetWarStream.closeEntry();
+        } else {
+            String origJarEntryName = origJarEntry.getName();
+            long modTime = -1;
+            String mergingDirName = origJarEntryName + "/";
+            if (mergingFiles.containsKey(mergingDirName)) {
+                modTime = mergingFiles.get(mergingDirName).lastModified();
+            } else {
+                modTime = origJarEntry.getTime();
+            }
+
+            JarEntry je = new JarEntry(origJarEntryName);
+            je.setTime(modTime);
+            targetWarStream.putNextEntry(je);
+
+            mergingFiles.remove(mergingDirName);
+
+            // build the jar data
+            String jarSimpleName = origJarEntryName.contains("/") ? origJarEntryName.substring(origJarEntryName.lastIndexOf("/") + 1)
+                    : origJarEntryName;
+            // // build the tmp jar file to write to
+            File tmpOutputJarFile = File.createTempFile(jarSimpleName, null);
+            JarOutputStream tmpOutputJar = new JarOutputStream(new FileOutputStream(tmpOutputJarFile));
+
+            // // dump the original jar file to iterate over
+            File tmpOrigJarFile = buildTempOrigJarFile(jarSimpleName + "_orig", origWar.getInputStream(origJarEntry));
+            JarFile tmpOrigJar = new JarFile(tmpOrigJarFile);
+
+            for (Enumeration<JarEntry> e = tmpOrigJar.entries(); e.hasMoreElements();) {
+                JarEntry origJarItemEntry = e.nextElement();
+                String origJarItemEntryName = origJarItemEntry.getName();
+                String mergingFileName = mergingDirName + origJarItemEntryName;
+                InputStream itemIn = null;
+                long itemModTime = -1;
+                // prefer dir files to origJar entries
+                if (mergingFiles.containsKey(mergingFileName)) {
+                    File f = mergingFiles.get(mergingFileName);
+                    if (!origJarItemEntry.isDirectory())
+                        itemIn = new FileInputStream(f);
+                    itemModTime = f.lastModified();
+                    mergingFiles.remove(mergingFileName);
+                } else {
+                    if (!origJarItemEntry.isDirectory())
+                        itemIn = tmpOrigJar.getInputStream(origJarItemEntry);
+                    itemModTime = origJarItemEntry.getTime();
+                }
+                addEntry(origJarItemEntryName, itemIn, itemModTime, tmpOutputJar);
+            }
+            tmpOrigJar.close();
+            tmpOrigJarFile.delete();
+
+            // check&write remained dir files
+            for (Map.Entry<String, File> remain : mergingFiles.entrySet()) {
+                String dirFileName = remain.getKey();
+                File dirFile = remain.getValue();
+                InputStream in = null;
+                if (!dirFile.isDirectory())
+                    in = new FileInputStream(dirFile);
+                addEntry(dirFileName.substring(mergingDirName.length()), in, dirFile.lastModified(), tmpOutputJar);
+            }
+            tmpOutputJar.close();
+
+            // write to war
+            InputStream jarData = new FileInputStream(tmpOutputJarFile);
+            flowTo(jarData, targetWarStream);
+            jarData.close();
+            tmpOutputJarFile.delete();
+            targetWarStream.closeEntry();
+        }
+    }
+
+    // build a temp file containing the given inputStream data
+    private File buildTempOrigJarFile(String name, InputStream in) throws IOException {
+        File f = File.createTempFile(name, null);
+        OutputStream out = new FileOutputStream(f);
+        try {
+            flowTo(in, out);
+        } finally {
+            out.close();
+        }
+        return f;
+    }
+
+    // data stream 'flow' from in to out, pseudo-zero-copy
+    private static void flowTo(InputStream in, OutputStream out) throws IOException {
+        try {
+            byte[] buf = new byte[1048576];
+            for (int count = in.read(buf); count != -1; count = in.read(buf)) {
+                out.write(buf, 0, count);
+            }
+        } finally {
+            in.close();
+        }
+    }
+
+    // collect entries which contain the specified dir path segment, and also
+    // delete from the original map
+    private Map<String, File> filterByDirName(Map<String, File> nameFileMapping, String pathSegment) {
+        Map<String, File> ret = new HashMap<String, File>();
+        if (!pathSegment.endsWith("/"))
+            pathSegment += "/";
+        for (Iterator<Map.Entry<String, File>> iter = nameFileMapping.entrySet().iterator(); iter.hasNext();) {
+            Map.Entry<String, File> e = iter.next();
+            if (e.getKey().contains(pathSegment)) {
+                ret.put(e.getKey(), e.getValue());
+                iter.remove();
+            }
+        }
+        return ret;
+    }
+
+    private static void addEntry(String entryName, InputStream in, long modTime, JarOutputStream target) throws IOException {
+        JarEntry e = new JarEntry(entryName);
+        e.setTime(modTime);
+        target.putNextEntry(e);
+        if (in != null) {
+            flowTo(in, target);
+        }
+        target.closeEntry();
     }
 
     /**
@@ -161,6 +314,20 @@ public class WarWriter {
         if (!f.exists())
             f.createNewFile();
         return new FileOutputStream(f);
+    }
+
+    /**
+     * get the temporarily pre-writing directory
+     */
+    public String getTempPrewriteDir() {
+        return this.tempDir.getAbsolutePath();
+    }
+
+    /**
+     * return the current writing war file path
+     */
+    public String getWarFilePath() {
+        return this.warFile.getAbsolutePath();
     }
 
 }

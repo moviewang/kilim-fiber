@@ -142,7 +142,11 @@ public class Weaver {
     }
 
     private static void weaveClsInJar(String clsFilePath, InputStream clsFileStream, Detector detector, String pathPrefix) throws IOException {
-        String clsName = clsFilePath.substring(0, clsFilePath.length() - 6).replace('/', '.');
+        int clsNameBeginInPath = 0;
+        if (pathPrefix != null) {
+            clsNameBeginInPath = pathPrefix.length() + 1;
+        }
+        String clsName = clsFilePath.substring(clsNameBeginInPath, clsFilePath.length() - 6).replace('/', '.');
         if (exclude(clsName))
             return;
         if (pathPrefix != null) {
@@ -241,7 +245,15 @@ public class Weaver {
         fos.write(ci.bytes);
         fos.close();
         if (verbose) {
-            System.out.println("Wrote: " + className);
+            System.out.println("Wrote: " + shadow(className));
+        }
+    }
+
+    private static String shadow(String filePath) {
+        if (ww != null) {
+            return ww.getWarFilePath() + filePath.substring(ww.getTempPrewriteDir().length());
+        } else {
+            return filePath;
         }
     }
 
@@ -275,7 +287,7 @@ public class Weaver {
     }
 
     static void help() {
-        System.err.println("java kilim.tools.Weaver opts -d <outputDir> (class/directory/jar)+");
+        System.err.println("java kilim.tools.Weaver opts -d <outputDir|warArchiveFile> (class/directory/jar)+|war");
         System.err.println("   where opts are   -q : quiet");
         System.err.println("                    -x <regex> : exclude all classes matching regex");
         System.exit(1);
@@ -307,7 +319,12 @@ public class Weaver {
             System.err.println("Specify output directory with -d option");
             System.exit(1);
         }
-        mkdir(outputDir);
+        if (outputDir.endsWith(".jar") || outputDir.endsWith(".war")) {
+            ww = new WarWriter(outputDir);
+            outputDir = ww.getTempPrewriteDir();
+        } else {
+            mkdir(outputDir);
+        }
         return ret;
     }
 

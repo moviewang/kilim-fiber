@@ -32,6 +32,9 @@ public class Weaver {
     public static String outputDir = null;
     public static boolean verbose = true;
     public static Pattern excludePattern = null;
+    public static Pattern includePattern = null;
+    // kilim classes defaults to weaving
+    private static Pattern kilimPattern = Pattern.compile("^kilim\\..*$");
     static int err = 0;
 
     static WarWriter ww;
@@ -66,7 +69,7 @@ public class Weaver {
         for (String name : parseArgs(args)) {
             try {
                 if (name.endsWith(".class")) {
-                    if (exclude(name))
+                    if (exclude(name) || !include(name))
                         continue;
                     currentName = name;
                     weaveFile(name, new BufferedInputStream(new FileInputStream(name)), detector);
@@ -129,7 +132,7 @@ public class Weaver {
 
     private static void weaveClsInWarJar(String jarName, String fileInWarJar, InputStream fileStream, Detector detector) throws IOException {
         String clsName = fileInWarJar.substring(0, fileInWarJar.length() - 6).replace('/', '.');
-        if (exclude(clsName))
+        if (exclude(clsName) || !include(clsName))
             return;
         // change output dir...
         String tmp = outputDir;
@@ -147,7 +150,7 @@ public class Weaver {
             clsNameBeginInPath = pathPrefix.length() + 1;
         }
         String clsName = clsFilePath.substring(clsNameBeginInPath, clsFilePath.length() - 6).replace('/', '.');
-        if (exclude(clsName))
+        if (exclude(clsName) || !include(clsName))
             return;
         if (pathPrefix != null) {
             // temporarily change output directory with path prefix
@@ -165,6 +168,10 @@ public class Weaver {
 
     static boolean exclude(String name) {
         return excludePattern == null ? false : excludePattern.matcher(name).find();
+    }
+
+    static boolean include(String name) {
+        return (includePattern == null || kilimPattern.matcher(name).find()) ? true : includePattern.matcher(name).find();
     }
 
     static void weaveFile(String name, InputStream is, Detector detector) throws IOException {
@@ -290,6 +297,7 @@ public class Weaver {
         System.err.println("java kilim.tools.Weaver opts -d <outputDir|warArchiveFile> (class/directory/jar)+|war");
         System.err.println("   where opts are   -q : quiet");
         System.err.println("                    -x <regex> : exclude all classes matching regex");
+        System.err.println("                    -i <regex> : include all classes matching regex");
         System.exit(1);
     }
 
@@ -311,6 +319,9 @@ public class Weaver {
             } else if (arg.equals("-x")) {
                 regex = args[++i];
                 excludePattern = Pattern.compile(regex);
+            } else if (arg.equals("-i")) {
+                regex = args[++i];
+                includePattern = Pattern.compile(regex);
             } else {
                 ret.add(arg);
             }

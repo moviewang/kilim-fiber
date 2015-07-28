@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,6 +28,8 @@ public class WarWriter {
     private File warFile;
     // the temp directory to pre-write...
     private File tempDir;
+
+    private static byte[] buf = new byte[1048576];// the writing buffer
 
     /**
      * create a war writer upon a war file... should also works for a jar file
@@ -243,6 +246,7 @@ public class WarWriter {
             flowTo(jarData, targetWarStream);
             jarData.close();
             tmpOutputJarFile.delete();
+
             targetWarStream.closeEntry();
         }
     }
@@ -262,7 +266,6 @@ public class WarWriter {
     // data stream 'flow' from in to out, pseudo-zero-copy
     private static void flowTo(InputStream in, OutputStream out) throws IOException {
         try {
-            byte[] buf = new byte[1048576];
             for (int count = in.read(buf); count != -1; count = in.read(buf)) {
                 out.write(buf, 0, count);
             }
@@ -274,6 +277,8 @@ public class WarWriter {
     // collect entries which contain the specified dir path segment, and also
     // delete from the original map
     private Map<String, File> filterByDirName(Map<String, File> nameFileMapping, String pathSegment) {
+        if (nameFileMapping == null || nameFileMapping.isEmpty())
+            return Collections.emptyMap();
         Map<String, File> ret = new HashMap<String, File>();
         if (!pathSegment.endsWith("/"))
             pathSegment += "/";

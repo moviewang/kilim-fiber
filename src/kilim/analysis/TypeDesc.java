@@ -25,12 +25,11 @@ import java.util.HashMap;
 import kilim.Constants;
 import kilim.mirrors.ClassMirrorNotFoundException;
 import kilim.mirrors.Detector;
-
 import asm5.org.objectweb.asm.Type;
 
 /**
- * A utility class that provides static methods for interning type strings and merging type
- * descriptors.
+ * A utility class that provides static methods for interning type strings and
+ * merging type descriptors.
  * 
  */
 public class TypeDesc {
@@ -109,7 +108,8 @@ public class TypeDesc {
         int start = off;
         switch (buf[off]) {
         case 'L':
-            while (buf[off++] != ';') {}
+            while (buf[off++] != ';') {
+            }
             return off - start;
         case 'B':
         case 'C':
@@ -161,10 +161,11 @@ public class TypeDesc {
     }
 
     /**
-     * Given two type descriptors, it returns an appropriate merge: 1) If they are Array types, the
-     * result is a an array of the merged component types 2) If they are ref types, it returns the
-     * least common super type. If one of them is an interface, the result is D_OBJECT 3) All other
-     * types must match exactly in order to not raise an error.
+     * Given two type descriptors, it returns an appropriate merge: 1) If they
+     * are Array types, the result is a an array of the merged component types
+     * 2) If they are ref types, it returns the least common super type. If one
+     * of them is an interface, the result is D_OBJECT 3) All other types must
+     * match exactly in order to not raise an error.
      */
 
     public static String mergeType(String a, String b) throws IncompatibleTypesException {
@@ -176,13 +177,11 @@ public class TypeDesc {
         char ac = a.charAt(0);
         char bc = b.charAt(0);
         if (a == D_NULL) {
-            assert b == D_NULL || bc == 'L' || bc == '[' : "merging NULL type with non ref type: "
-                    + b;
+            assert b == D_NULL || bc == 'L' || bc == '[' : "merging NULL type with non ref type: " + b;
             return b;
         }
         if (b == D_NULL) {
-            assert b == D_NULL || bc == 'L' || bc == '[' : "merging NULL type with non ref type: "
-                    + a;
+            assert b == D_NULL || bc == 'L' || bc == '[' : "merging NULL type with non ref type: " + a;
             return a;
         }
         if (a == b || a.equals(b))
@@ -204,10 +203,10 @@ public class TypeDesc {
         case '[':
             if (bc == '[') {
                 try {
-                    return "["
-                            + mergeType(TypeDesc.getComponentType(a), TypeDesc.getComponentType(b));
+                    return "[" + mergeType(TypeDesc.getComponentType(a), TypeDesc.getComponentType(b));
                 } catch (IncompatibleTypesException ite) {
-                    // The component types are incompatible, but two disparate arrays still
+                    // The component types are incompatible, but two disparate
+                    // arrays still
                     // inherit from Object
                     return D_OBJECT;
                 }
@@ -244,22 +243,19 @@ public class TypeDesc {
             if (oa.equals(ob))
                 return oa;
 
-            String lub = Detector.getDetector()
-            		.commonSuperType(getInternalName(oa), 
-            						 getInternalName(ob));
+            String lub = Detector.getDetector().commonSuperType(getInternalName(oa), getInternalName(ob));
 
             if (lub.equals("java/lang/Object"))
-            	return D_OBJECT;
+                return D_OBJECT;
             return "L" + lub + ";";
 
         } catch (ClassMirrorNotFoundException cnfe) {
-            throw new InternalError(cnfe.getMessage());
+            throw new InternalError(cnfe.getCause() == null ? cnfe.getMessage() : cnfe.getCause().toString());
         }
     }
 
     public static boolean isIntType(String typeDesc) {
-        return (typeDesc == D_INT || typeDesc == D_CHAR || typeDesc == D_SHORT
-                || typeDesc == D_BYTE || typeDesc == D_BOOLEAN);
+        return (typeDesc == D_INT || typeDesc == D_CHAR || typeDesc == D_SHORT || typeDesc == D_BYTE || typeDesc == D_BOOLEAN);
     }
 
     public static boolean isRefType(String typeDesc) {
@@ -277,7 +273,8 @@ public class TypeDesc {
     }
 
     // public static void main(String[] args) throws Exception {
-    // System.out.println(mergeType("Lkilim/test/ex/ExC;", "Lkilim/test/ex/ExD;"));
+    // System.out.println(mergeType("Lkilim/test/ex/ExC;",
+    // "Lkilim/test/ex/ExD;"));
     // }
 
 }

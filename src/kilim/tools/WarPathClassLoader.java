@@ -108,12 +108,12 @@ public class WarPathClassLoader extends URLClassLoader {
                 File f = new File(dirPath + file.getName());
 
                 if (file.isDirectory()) { // if its a directory, create it
-                    f.mkdir();
+                    f.mkdirs();
                     continue;
                 }
 
                 InputStream is = jar.getInputStream(file);
-                FileOutputStream fos = new FileOutputStream(f);
+                FileOutputStream fos = ensureOpen(f);
 
                 // write contents of 'is' to 'fos'
                 for (int avai = is.read(buf); avai != -1; avai = is.read(buf)) {
@@ -125,6 +125,17 @@ public class WarPathClassLoader extends URLClassLoader {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    // if does not exist, create one, and ensure all parent dirs exist
+    private static FileOutputStream ensureOpen(File f) throws IOException {
+        if (!f.exists()) {
+            File p = f.getParentFile();
+            if (p != null && !p.exists())
+                p.mkdirs();
+            f.createNewFile();
+        }
+        return new FileOutputStream(f);
     }
 
     private static File createTempDirectory(String dirName) {

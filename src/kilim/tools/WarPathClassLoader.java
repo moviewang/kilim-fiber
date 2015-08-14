@@ -98,8 +98,9 @@ public class WarPathClassLoader extends URLClassLoader {
         String dirPath = dir.getAbsolutePath();
         if (!dirPath.endsWith("/"))
             dirPath += "/";
+        JarFile jar = null;
         try {
-            JarFile jar = new JarFile(w);
+            jar = new JarFile(w);
             Enumeration<JarEntry> e = jar.entries();
             byte[] buf = new byte[4096];
 
@@ -124,6 +125,12 @@ public class WarPathClassLoader extends URLClassLoader {
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            if (jar != null)
+                try {
+                    jar.close();
+                } catch (IOException e) {
+                }
         }
     }
 

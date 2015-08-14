@@ -98,29 +98,33 @@ public class WarWriter {
         // // merging write to the temp war
         JarOutputStream jos = new JarOutputStream(new FileOutputStream(tempWar));
         JarFile jf = new JarFile(this.warFile);
-        Enumeration<JarEntry> iter = jf.entries();
-        while (iter.hasMoreElements()) {
-            JarEntry e = iter.nextElement();
-            String name = e.getName();
-            if (!e.isDirectory() && name.endsWith(".jar")) {
-                writeJarEntry(e, filterByDirName(tempDirFiles, name), jf, jos);
-            } else {
-                // prefer file in dir to war
-                InputStream fin = null;
-                if (tempDirFiles.containsKey(name)) {
-                    File f = tempDirFiles.get(name);
-                    if (!e.isDirectory())
-                        fin = new FileInputStream(f);
-                    addEntry(name, fin, f.lastModified(), jos);
-                    tempDirFiles.remove(name);
+        try {
+            Enumeration<JarEntry> iter = jf.entries();
+            while (iter.hasMoreElements()) {
+                JarEntry e = iter.nextElement();
+                String name = e.getName();
+                if (!e.isDirectory() && name.endsWith(".jar")) {
+                    writeJarEntry(e, filterByDirName(tempDirFiles, name), jf, jos);
                 } else {
-                    if (!e.isDirectory())
-                        fin = jf.getInputStream(e);
-                    addEntry(name, fin, e.getTime(), jos);
+                    // prefer file in dir to war
+                    InputStream fin = null;
+                    if (tempDirFiles.containsKey(name)) {
+                        File f = tempDirFiles.get(name);
+                        if (!e.isDirectory())
+                            fin = new FileInputStream(f);
+                        addEntry(name, fin, f.lastModified(), jos);
+                        tempDirFiles.remove(name);
+                    } else {
+                        if (!e.isDirectory())
+                            fin = jf.getInputStream(e);
+                        addEntry(name, fin, e.getTime(), jos);
+                    }
                 }
             }
+        } finally {
+            if (jf != null)
+                jf.close();
         }
-        jf.close();
         // // writing remained files in dir
         for (Map.Entry<String, File> remain : tempDirFiles.entrySet()) {
             String dirFileName = remain.getKey();
@@ -132,10 +136,30 @@ public class WarWriter {
         }
         // // replace the target war using the temp war
         jos.close();
-        tempWar.renameTo(warFile);
+        moveTo(tempWar, warFile);
         // clean
         // // cleaning temp dir
         recurDel(this.tempDir);
+    }
+
+    // move from to files
+    private void moveTo(File from, File to) throws IOException {
+        // try rename directly
+        if (!from.renameTo(to)) {
+            // renameTo failed, fallback to file flowing...
+            System.out.println("File.renameTo failed, fallback to file streaming...");
+            if (!from.exists())
+                throw new IOException("From file does not exist: " + from.getAbsolutePath());
+            if (!to.exists() && !to.createNewFile())
+                throw new IOException("To from does not exist and cannot be created: " + to.getAbsolutePath());
+            OutputStream o = new FileOutputStream(to);
+            try {
+                flowTo(new FileInputStream(from), o);
+            } finally {
+                o.close();
+            }
+            System.out.println("File stream flowing moving done!");
+        }
     }
 
     /*

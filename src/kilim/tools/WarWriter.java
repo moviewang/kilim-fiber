@@ -156,6 +156,7 @@ public class WarWriter {
             try {
                 flowTo(new FileInputStream(from), o);
             } finally {
+                from.delete();
                 o.close();
             }
             System.out.println("File stream flowing moving done!");

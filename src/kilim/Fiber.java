@@ -245,6 +245,7 @@ public final class Fiber {
     public int upEx() {
         // compute new iStack. 
         int is = task.getStackDepth() - 2; // remove upEx and convert to 0-based index. 
+        if(is >= stateStack.length) ensureSize(is + 1); // issue: https://github.com/pfmiles/kilim-fiber/issues/4
         State cs = stateStack[is];
 
         for (int i = iStack; i >= is; i--) {

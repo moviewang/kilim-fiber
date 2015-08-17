@@ -248,7 +248,8 @@ public final class Fiber {
         if(is >= stateStack.length) ensureSize(is + 1); // issue: https://github.com/pfmiles/kilim-fiber/issues/4
         State cs = stateStack[is];
 
-        for (int i = iStack; i >= is; i--) {
+        // for (int i = iStack; i >= is; i--) { TODO clear states when exception, fix when stack adjustment OK
+        for(int i = 0; i < stateStack.length; i++) {
             stateStack[i] = null; // release state
         }
 

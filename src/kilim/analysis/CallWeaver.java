@@ -416,6 +416,7 @@ public class CallWeaver {
      * Is the given method the sole abstract method (modulo woven variants).
      */
     boolean isSAM(MethodInsnNode mi) {
+        if(Utils.JDK_VER < 1.8) return false;
         Detector det = this.detector;
         int count = 0;
         boolean match = false; 

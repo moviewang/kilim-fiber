@@ -547,11 +547,11 @@ public class MethodWeaver {
     }
     
     void makeNotWovenMethod(ClassVisitor cv, MethodFlow mf, boolean isSAM) {
-//        if (classWeaver.isInterface()) {
-//             MethodVisitor mv = cv.visitMethod(mf.access, mf.name, mf.desc, 
-//                    mf.signature, ClassWeaver.toStringArray(mf.exceptions));
-//             mv.visitEnd();
-//        } else {
+        if (Utils.JDK_VER < 1.8 && classWeaver.isInterface()) {
+             MethodVisitor mv = cv.visitMethod(mf.access, mf.name, mf.desc, 
+                    mf.signature, ClassWeaver.toStringArray(mf.exceptions));
+             mv.visitEnd();
+        } else {
             // Turn of abstract modifier
             int access = mf.access;
             access &= ~Constants.ACC_ABSTRACT;
@@ -588,7 +588,7 @@ public class MethodWeaver {
             }
             mv.visitMaxs(stacksize, numlocals);
             mv.visitEnd();
-//        }
+        }
     }
 
 

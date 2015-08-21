@@ -7,12 +7,17 @@
 package kilim.analysis;
 
 /**
- * Simple string utils for pretty printing support
- *
+ * Simple string utils for pretty printing support <br/>
+ * pf_miles: and also some convenient global functions
+ * 
  */
 public class Utils {
+    /**
+     * the major version of current jdk
+     */
+    public static final double JDK_VER = getVersion();
     public static String indentStr = "";
-    public static String spaces    = "                                        ";
+    public static String spaces = "                                        ";
 
     public static void indentWith(String s) {
         indentStr = indentStr + s;
@@ -74,5 +79,12 @@ public class Utils {
 
     public static void pn(Object o) {
         pn((o == null) ? "null" : o.toString());
+    }
+
+    private static double getVersion() {
+        String version = System.getProperty("java.version");
+        int pos = version.indexOf('.');// first pos
+        pos = version.indexOf('.', pos + 1); // second pos
+        return Double.parseDouble(version.substring(0, pos));
     }
 }

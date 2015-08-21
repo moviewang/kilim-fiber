@@ -172,7 +172,7 @@ public class ClassFlow extends ClassNode {
      * SAM methods are given special treatment 
      */
     public MethodFlow getSAM() {
-        if (!isInterface()) {
+        if (Utils.JDK_VER < 1.8 || !isInterface()) {
             return null;
         }
         MethodFlow sam = null;

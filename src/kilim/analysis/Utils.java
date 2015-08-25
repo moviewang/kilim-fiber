@@ -16,6 +16,10 @@ public class Utils {
      * the major version of current jdk
      */
     public static final double JDK_VER = getVersion();
+    /**
+     * the cpu core number of current machine
+     */
+    public static final int PROC_NUM = Runtime.getRuntime().availableProcessors();
     public static String indentStr = "";
     public static String spaces = "                                        ";
 

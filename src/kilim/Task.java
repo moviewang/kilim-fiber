@@ -6,6 +6,7 @@
 
 package kilim;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -109,10 +110,10 @@ public abstract class Task implements Runnable {
         if (ret == null) {
             // check if method pausable Reflectively
             Method[] ms = reflectMethods(ste);
-            if (ms == null || ms.length == 0) {
+            if (ms == null || ms.length == 0 || ms.length == 1) {
                 ret = false;
-            } else if (ms.length == 1) {
-                ret = hasPausableException(ms[0].getExceptionTypes());
+            } else if (ms.length == 2) {
+                ret = isPausableWeavedPair(ms[0], ms[1]);
             } else {
                 // more than one method found, must determine it by bytecode
                 // analyzing
@@ -129,6 +130,24 @@ public abstract class Task implements Runnable {
             isPausableCache.put(ste, ret);
         }
         return ret;
+    }
+
+    // test if this two methods are kilim-weaved-pausable-pair methods
+    private Boolean isPausableWeavedPair(Method m1, Method m2) {
+        // both 'pausable'
+        if (hasPausableException(m1.getExceptionTypes()) && hasPausableException(m2.getExceptionTypes())) {
+            // one has 'fiber' as its last parameter while the other doesn't
+            return hasFiberAsLastParam(m1) ^ hasFiberAsLastParam(m2);
+        }
+        return false;
+    }
+
+    // test if a method's last parameter is of type kilim.Fiber
+    private boolean hasFiberAsLastParam(Method m) {
+        Class<?>[] ps = m.getParameterTypes();
+        if (ps == null || ps.length == 0)
+            return false;
+        return Fiber.class.equals(ps[ps.length - 1]);
     }
 
     // test if specified stack trace element located in a pausable method, by
@@ -153,9 +172,14 @@ public abstract class Task implements Runnable {
             MethodLocatingVisitor locating = new MethodLocatingVisitor(Opcodes.ASM5, ste.getLineNumber());
             try {
                 ClassReader cr = new ClassReader(is);
-                cr.accept(locating, ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES);
+                cr.accept(locating, ClassReader.SKIP_FRAMES);
             } catch (Exception e) {
                 return oneHasPausableException(ms);
+            } finally {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                }
             }
             MethodSignature sig = locating.getLocatedMethod();
             if (sig == null) {
@@ -201,19 +225,28 @@ public abstract class Task implements Runnable {
         String clsName = ste.getClassName();
         Class<?> cls = null;
         ClassLoader ld = Thread.currentThread().getContextClassLoader();
-        if (ld == null)
+        boolean threadLoader = true;
+        if (ld == null) {
             ld = Task.class.getClassLoader();
-        try {
-            cls = ld.loadClass(clsName);
-        } catch (ClassNotFoundException e) {
-            ld = Task.class.getClassLoader();
+            threadLoader = false;
         }
         try {
             cls = ld.loadClass(clsName);
         } catch (ClassNotFoundException e) {
-            System.err.println("Could not load class when analyzing invocation stack: " + e);
-            return null;
+            if (threadLoader) {
+                ld = Task.class.getClassLoader();
+                try {
+                    cls = ld.loadClass(clsName);
+                } catch (ClassNotFoundException ex) {
+                    System.err.println("Could not load class when analyzing invocation stack: " + ex);
+                    return null;
+                }
+            } else {
+                System.err.println("Could not load class when analyzing invocation stack: " + e);
+                return null;
+            }
         }
+
         Method[] ms = cls.getDeclaredMethods();
         List<Method> ret = new ArrayList<Method>();
         for (Method m : ms)

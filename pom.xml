@@ -9,6 +9,31 @@
 	<version>1.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<name>kilim-fiber</name>
+	<description>A fiber implementation for java.</description>
+	<url>https://github.com/pfmiles/kilim-fiber</url>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	
+	<developers>
+        <developer>
+            <id>pf_miles</id>
+            <name>Yue Wen</name>
+            <email>miles.wy.1@gmail.com</email>
+        </developer>
+    </developers>
+    
+    <scm>
+        <url>https://github.com/pfmiles/kilim-fiber</url>
+        <connection>scm:git:git@github.com:pfmiles/kilim-fiber.git</connection>
+    </scm>
+
 	<profiles>
 		<profile>
 			<id>use-standard-tool-jar</id>

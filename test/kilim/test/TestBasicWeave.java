@@ -140,4 +140,18 @@ public class TestBasicWeave extends TestCase {
         return ret.toArray(new Method[ret.size()]);
     }
 
+    // test the 'isInPausableMethodByAsm' method
+    public void testIsInPausableMethodByAsm() throws Exception {
+        Method isInPausableMethodByAsm = reflectMethods(Task.class, "isInPausableMethodByAsm")[0];
+        isInPausableMethodByAsm.setAccessible(true);
+
+        // WeavePairExamples line 14: true
+        StackTraceElement t = new StackTraceElement("kilim.examples.weavedpair.WeavePairExamples", "weavePublic", "WeavePairExamples.java", 14);
+        assertTrue((Boolean) isInPausableMethodByAsm.invoke(null, t, new Method[0]));
+
+        // WeavePairExamples line 70: false
+        t = new StackTraceElement("kilim.examples.weavedpair.WeavePairExamples", "notPausable", "WeavePairExamples.java", 70);
+        assertFalse((Boolean) isInPausableMethodByAsm.invoke(null, t, new Method[0]));
+    }
+
 }

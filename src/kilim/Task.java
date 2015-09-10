@@ -118,7 +118,7 @@ public abstract class Task implements Runnable {
                 ret = isPausableWeavedPair(ms[0], ms[1]);
             } else {
                 // more than one method found, must determine it by bytecode
-                // analyzing TODO need to be tested
+                // analyzing
                 if (ste.getLineNumber() > 0) {
                     ret = isInPausableMethodByAsm(ste, ms);
                 } else {

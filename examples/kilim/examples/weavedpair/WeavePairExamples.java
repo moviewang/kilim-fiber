@@ -65,4 +65,8 @@ public class WeavePairExamples {
 
     protected void falseDiffMod1() throws Pausable {
     }
+
+    public void notPausable() {
+        System.out.println("Not pausable.");
+    }
 }

@@ -11,7 +11,9 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
@@ -116,7 +118,7 @@ public abstract class Task implements Runnable {
                 ret = isPausableWeavedPair(ms[0], ms[1]);
             } else {
                 // more than one method found, must determine it by bytecode
-                // analyzing
+                // analyzing TODO need to be tested
                 if (ste.getLineNumber() > 0) {
                     ret = isInPausableMethodByAsm(ste, ms);
                 } else {
@@ -133,17 +135,49 @@ public abstract class Task implements Runnable {
     }
 
     // test if this two methods are kilim-weaved-pausable-pair methods
-    private Boolean isPausableWeavedPair(Method m1, Method m2) {
-        // both 'pausable'
-        if (hasPausableException(m1.getExceptionTypes()) && hasPausableException(m2.getExceptionTypes())) {
+    private static Boolean isPausableWeavedPair(Method m1, Method m2) {
+        // both 'pausable' and have the same modifiers, and the same exceptions
+        Class<?>[] exs1 = m1.getExceptionTypes();
+        Class<?>[] exs2 = m2.getExceptionTypes();
+        if (m1.getModifiers() == m2.getModifiers() && hasPausableException(exs1) && hasSameExceptions(exs1, exs2)) {
             // one has 'fiber' as its last parameter while the other doesn't
-            return hasFiberAsLastParam(m1) ^ hasFiberAsLastParam(m2);
+            // and any other params the same
+            return (hasFiberAsLastParam(m1) ^ hasFiberAsLastParam(m2)) && hasSameParamsExceptLast(m1, m2);
         }
         return false;
     }
 
+    private static boolean hasSameParamsExceptLast(Method m1, Method m2) {
+        Class<?>[] ps1 = m1.getParameterTypes();
+        Class<?>[] ps2 = m2.getParameterTypes();
+        if (Math.abs(ps1.length - ps2.length) != 1)
+            return false;
+        int l = -1;
+        if (ps1.length > ps2.length) {
+            l = ps2.length;
+        } else {
+            l = ps1.length;
+        }
+        for (int i = 0; i < l; i++)
+            if (!ps1[i].equals(ps2[i]))
+                return false;
+        return true;
+    }
+
+    private static boolean hasSameExceptions(Class<?>[] exs1, Class<?>[] exs2) {
+        if (exs1.length != exs2.length)
+            return false;
+        Set<Class<?>> e1 = new HashSet<Class<?>>();
+        for (Class<?> ee1 : exs1)
+            e1.add(ee1);
+        for (Class<?> ee2 : exs2)
+            if (!e1.contains(ee2))
+                return false;
+        return true;
+    }
+
     // test if a method's last parameter is of type kilim.Fiber
-    private boolean hasFiberAsLastParam(Method m) {
+    private static boolean hasFiberAsLastParam(Method m) {
         Class<?>[] ps = m.getParameterTypes();
         if (ps == null || ps.length == 0)
             return false;
@@ -152,7 +186,7 @@ public abstract class Task implements Runnable {
 
     // test if specified stack trace element located in a pausable method, by
     // line number, using asm bytecode analysis
-    private boolean isInPausableMethodByAsm(StackTraceElement ste, Method[] ms) {
+    private static boolean isInPausableMethodByAsm(StackTraceElement ste, Method[] ms) {
         ClassLoader ld = Thread.currentThread().getContextClassLoader();
         boolean threadLoader = true;
         if (ld == null) {
@@ -190,7 +224,7 @@ public abstract class Task implements Runnable {
         }
     }
 
-    private boolean oneHasPausableException(Method[] ms) {
+    private static boolean oneHasPausableException(Method[] ms) {
         boolean ret = false;
         boolean oneHasNoPausableException = false;
         for (Method m : ms) {
@@ -212,7 +246,7 @@ public abstract class Task implements Runnable {
     }
 
     // check if the specified method has 'Pausable' exception
-    private boolean hasPausableException(Class<?>[] exTypes) {
+    private static boolean hasPausableException(Class<?>[] exTypes) {
         for (Class<?> ex : exTypes) {
             if (Pausable.class.equals(ex))
                 return true;

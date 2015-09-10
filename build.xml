@@ -8,6 +8,7 @@
 		<pathelement path="${java.class.path}" />
 	</path>
 	<path id="kilim.testwovenclasspath">
+		<!-- 'testclasses' is prior to 'classes' when class loading -->
 		<pathelement location="testclasses/" />
 		<pathelement location="classes/" />
 		<fileset dir="./libs">
@@ -105,14 +106,18 @@
 
 	<!-- This runs those tests depend on generated classes in testclasses-->
 	<target name="testwoven">
-		<!--<echo message="Testing Tasks ======================" />-->
-		<!--<java classname="junit.textui.TestRunner" fork="yes">-->
-		<!--<classpath refid="kilim.testwovenclasspath"/>-->
-		<!--<assertions>-->
-		<!--<enable/>-->
-		<!--</assertions>-->
-		<!--<arg value="kilim.test.AllWoven" />-->
-		<!--</java>-->
+		<echo message="Testing Tasks ======================" />
+		<java classname="junit.textui.TestRunner" fork="yes">
+			<!--
+			<jvmarg value="-Xdebug" />
+			<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=19999" />
+			 -->
+			<classpath refid="kilim.testwovenclasspath" />
+			<assertions>
+				<enable />
+			</assertions>
+			<arg value="kilim.test.AllWoven" />
+		</java>
 	</target>
 
 	<target name="maven" depends="all,test" description="generate the maven jar">
